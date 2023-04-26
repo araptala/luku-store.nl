@@ -1,4 +1,4 @@
-function loadImage(image) {
+function loadImage() {
   console.log("Product view page connected");
 }
 

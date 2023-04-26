@@ -42,7 +42,7 @@ function addCookieItem(productId, action) {
 function updateUserOrder(productId, action) {
   console.log("User is logged in, sending data...");
 
-  var url = "/update_item/";
+  var url = "/updateItem/";
 
   fetch(url, {
     method: "POST",

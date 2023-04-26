@@ -6,6 +6,7 @@ import changeWishlistIcon from "./changeWishlistIcon.js";
 import hoverAnimation from "./animations.js";
 import footerYear from "./footer-year.js";
 import smoothScroll from "./smooth-scroll.js";
+import newsletterSubmitEvent from "./newsletter.js";
 
 // Loading function
 // loading();
@@ -18,6 +19,9 @@ footerYear();
 
 // Function for loading the images on the products page
 loadImage();
+
+// Newsletter subscription event
+newsletterSubmitEvent();
 
 // Favicon
 favicon();
