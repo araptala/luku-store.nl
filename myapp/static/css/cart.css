@@ -1,37 +1,11 @@
-html {
-  scroll-behavior: smooth 0.5s ease;
-}
-/* CAROUSEL */
-.carousel-container {
-  /* width: 100%;
-  margin: auto; */
-  width: auto;
-  margin: auto;
-  /* overflow: hidden; */
-  /* background-color: yellow; */
-}
-
-.carousel-slide {
-  display: flex;
-  flex-direction: column;
-}
-
-.slide {
-  /* background-color: rebeccapurple; */
-  display: flex;
-  width: 100%;
-}
-/* CAROUSEL */
-
 .confirmed {
   font-size: 16px;
-  margin: 25px 100px 50px 100px;
+  margin: 0px 100px 50px 100px;
   align-items: center;
   text-align: center;
   justify-items: center;
   display: flex;
   flex-direction: column;
-  width: 100%;
 }
 
 .confirmed-heading {
@@ -69,10 +43,8 @@ html {
 }
 
 .left-payment-child {
-  /* background-color: yellow; */
   display: flex;
   flex-direction: column;
-  align-items: left;
 }
 
 .select-heading {
@@ -80,7 +52,6 @@ html {
 }
 
 .form {
-  /* background-color: rgb(234, 103, 103); */
   display: flex;
   flex-direction: column;
   width: 525px;
@@ -95,11 +66,12 @@ html {
   justify-content: center;
   justify-content: space-evenly;
   font-size: 34px;
-  cursor: pointer;
+  transition: 0.75s ease-out;
+  color: #3a3a3a;
 }
 
-.credit-icon {
-  cursor: pointer;
+.payment-icons:hover {
+  color: #000;
 }
 
 .form-group {
@@ -113,9 +85,11 @@ html {
 .check-group {
   display: flex;
   flex-direction: row;
+  width: auto;
+  align-items: center;
   border: 1px solid #737373;
   border-radius: 10px;
-  padding: 15px 0px 15px 30px;
+  padding: 15px 30px 15px 30px;
   margin-bottom: 25px;
 }
 
@@ -527,16 +501,15 @@ table {
 /* shipping */
 
 .hidden {
-  display: hidden;
+  display: none;
 }
 
 /* shipping */
 .box-element {
-  /* background-color: yellow; */
-  margin: 50px 100px 0px 100px;
-  width: 550px;
+  margin: 0px 100px 0px 100px;
   display: flex;
   flex-direction: column;
+  justify-items: center;
 }
 
 .form-field {
@@ -559,9 +532,10 @@ table {
 .checkout-current {
   font-size: 2.5rem;
   font-weight: 700;
+  color: #000;
 }
 
-.checkout-top {
+.cart-top {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -570,6 +544,20 @@ table {
 
 .cart-bread-crumbs {
   margin: 0px 100px 0px 100px;
+}
+
+.cart-navigation {
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  color: #3a3a3a;
+  gap: 15px;
+  font-size: 0.8rem;
+}
+.cart-navigation a {
+  text-decoration: none;
+  color: #000;
 }
 
 .order-item {
@@ -594,4 +582,41 @@ table {
   font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  justify-items: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.payment-form button {
+  cursor: pointer;
+  border: none;
+  transition: 0.5s ease-out;
+}
+
+.payment-form button:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: row;
+}
+
+.payment-button {
+  border-radius: 25px;
+  background-color: #3a3a3a;
+  padding: 10px 30px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+.payment-button:hover {
+  background-color: #000;
 }

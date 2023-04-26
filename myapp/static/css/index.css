@@ -271,20 +271,34 @@ hr {
   font-size: 12px;
 }
 
-.newsletter input {
-  margin-top: 15px;
-  border-radius: 25px;
-  border: 1px solid #b9b9b9;
-  background-color: #9e9e9e31;
-  padding: 15px 30px 15px 30px;
-  width: 100%;
-}
-
 .newsletter p {
   margin-top: 25px;
   font-size: 12px;
 }
 
+.footer-newsletter {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  justify-content: space-between;
+}
+
+.footer-newsletter {
+  font-size: 0.7rem;
+}
+.footer-newsletter-input {
+  margin-top: 15px;
+  border-radius: 25px;
+  padding: 10px 0px 10px 25px;
+  border: 1px solid #bdbdbd;
+  background-color: #e7e7e7;
+  color: #2d2d2d;
+}
+
+.hyperlink-default {
+  text-decoration: none;
+  color: inherit;
+}
 /* NEWSLETTER PAGE */
 .newsletter-page {
   display: flex;
@@ -295,6 +309,33 @@ hr {
   align-items: center;
   justify-content: center;
   justify-items: center;
+}
+in .newsletter-pag form {
+  display: flex;
+  flex-direction: column;
+}
+.newsletter-checkbox {
+  margin-top: 25px;
+  display: flex;
+  flex-direction: column;
+}
+.newsletter-checkbox a {
+  text-decoration: none;
+}
+
+.newsletter-form-check {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+.newsletter-form-check a {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+}
+.newsletter-form-check input {
+  align-items: center;
+  margin: 0px 0px;
 }
 /* END OF NEWSLETTER PAGE */
 
@@ -755,4 +796,49 @@ hr {
 
 .index-heading {
   font-size: 3rem;
+}
+
+#newsletter-form h1 {
+  font-size: 4rem;
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin: 0px 100px 0px 100px;
+  gap: 100px;
+  justify-content: space-around;
+}
+.signup-right {
+  width: 75%;
+}
+.signup-right img {
+  border-radius: 25px;
+}
+.signup-left {
+  margin-left: 10%;
+}
+.signup-left input {
+  border-radius: 8px;
+  background-color: #e7e7e7;
+  color: #2d2d2d;
+  padding: 10px 30px 10px 30px;
+  width: 100%;
+  border: 1px solid #bdbdbd;
+  margin-bottom: 25px;
+}
+form button {
+  width: 100%;
+  border-radius: 25px;
+  border: none;
+  background-color: #2d2d2d;
+  padding: 15px 0px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.5s ease-out;
+}
+form button:hover {
+  background-color: #000;
 }

@@ -18,7 +18,6 @@
   height: 100%;
   width: auto;
   margin: 0px 100px 0px 100px;
-  /* background-color: #2d2d2d; */
 }
 
 .product-left {
@@ -27,13 +26,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  /* background-color: aqua; */
 }
 .images img {
   height: 100%;
   width: 575px;
   object-fit: cover;
   justify-content: center;
+  cursor: zoom-in;
+}
+.images a {
+  cursor: zoom-in;
 }
 /* RIGHT SECTION */
 .right {
@@ -280,3 +282,6 @@
 }
 
 /* END OF PRODUCT DETAIL */
+.zoom-preview {
+  height: 300px;
+}
