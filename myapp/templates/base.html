@@ -55,9 +55,17 @@
     />
     <!-- END OF ABOUT US CSS -->
 
-    <!-- CART-CONFIRMED -->
+    <!-- CART -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/cart.css' %}" />
-    <!-- END OF CART-CONFIRMED -->
+    <!-- END OF CART -->
+
+    <!-- BRANDS -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/brands.css' %}"
+    />
+    <!-- END OF BRANDS -->
 
     <!-- CONTACT US -->
     <link
@@ -176,8 +184,8 @@
               ></a>
             </li>
             <li>
-              <a href="{% url 'signup' %}"
-                ><i class="signed-in-user fa-solid fa-user"></i
+              <a href="{% url 'signup' %}">
+                <i class="signed-in-user fa-solid fa-user"> </i
               ></a>
             </li>
             <li>
@@ -250,13 +258,26 @@
           newsletter and more.
         </p>
 
-        <form id="newsletter-form">
+        <form id="newsletter-form" class="footer-newsletter" method="POST">
+          {% csrf_token %}
           <input
-            id="newsletter-input"
-            class="newsletter-input"
+            id="newsletter-email"
+            class="footer-newsletter-input"
             type="email"
-            placeholder="Email Address"
-          />
+            placeholder="Enter your email address"
+            name="email"
+            required
+          /><span
+            ><input type="checkbox" id="myCheck" required />
+            I accept the
+            <a class="hyperlink-default" href="/help/#termsOfService"
+              >Terms of Service</a
+            >
+            and
+            <a class="hyperlink-default" href="/help/#privacyPolicy"
+              >Privacy Policy.</a
+            >
+          </span>
         </form>
       </div>
       <!-- END OF NEWSLETTER SECTION -->
