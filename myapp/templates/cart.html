@@ -3,30 +3,33 @@
   <!-- NAVIGATION -->
   <!-- END OF NAVIGATION -->
   <header class="cart-bread-crumbs">
-    <div class="checkout-top">
+    <div class="cart-top">
       <h3 class="checkout-current">Cart Summary</h3>
       <a class="checkout-button" href="{% url 'checkout' %}"
         >Checkout &#8594;</a
       >
     </div>
 
-    <ol class="links">
+    <ol class="cart-navigation">
+      <li>
+        <p class="underline current">1. Cart Summary</p>
+      </li>
       <li>
         <a class="underline" href="{% url 'checkout' %}"
-          >2. Shipping Information &#8594;</a
+          >2. Shipping Information</a
         >
       </li>
       <li>
         <p>3. Select Payment Method</p>
       </li>
       <li>
-        <p>4. Order Confirmed</p>
+        <p>4. Order Confirmation</p>
       </li>
     </ol>
   </header>
 
   <div class="cart-header">
-    <h4>Items: {{ cartItems }}</h4>
+    <h4>Total Items: {{ cartItems }}</h4>
     <h4>Total: €{{ order.get_cart_total }}</h4>
   </div>
 
@@ -44,13 +47,19 @@
     <div class="order-item">
       <!-- image -->
       <div>
-        <img class="order-image" src="{{ item.product.imageURL }}" alt="" />
+        <a href="{% url 'product_detail' item.product.pk %}">
+          <img class="order-image" src="{{ item.product.imageURL }}" alt=""
+        /></a>
       </div>
       <!-- end of image -->
 
       <!-- name -->
       <div>
-        <p class="cart-item-name">{{ item.product.name }}</p>
+        <a
+          style="text-decoration: none; color: inherit"
+          href="{% url 'product_detail' item.product.pk %}"
+          ><p class="cart-item-name">{{ item.product.name }}</p></a
+        >
         <p class="cart-item-price">€{{ item.product.price }}</p>
       </div>
       <!-- end of name -->
