@@ -2,29 +2,29 @@
 
 <!-- NAVIGATION -->
 <!-- END OF NAVIGATION -->
-<header class="bread-crumbs">
-  <a class="checkout-current" href="{% url 'checkout' %}"
-    >Shipping Information</a
-  >
-  <ol class="links">
+<header class="cart-bread-crumbs">
+  <p id="checkout-current" class="checkout-current">Shipping Information</p>
+  <ol class="cart-navigation">
     <li>
-      <a disabled class="underline" href="{% url 'cart' %}">1. Cart Summary</a>
+      <a class="underline" href="{% url 'cart' %}">1. Cart Summary</a>
     </li>
     <li>
-      <a class="underline" href="{% url 'cart' %}">2. Shipping Information</a>
+      <p id="digital-false" class="underline current">
+        2. Shipping Information
+      </p>
     </li>
     <li>
-      <a class="underline" href="#select-payment-method">
-        3. Select Payment Method</a
-      >
+      <p id="digital-true" class="underline">3. Select Payment Method</p>
     </li>
     <li>
-      <a class="underline" href="#confirmed">4. Confirm Order</a>
+      <p id="confirmed-true" class="underline">4. Confirm Order</p>
     </li>
   </ol>
 </header>
+
 <!-- FORM -->
 <div class="box-element" id="form-wrapper">
+  <p id="shipping-subheading" style="margin-bottom: 25px"></p>
   <form id="form">
     {% csrf_token %}
     <div id="user-info">
@@ -53,6 +53,7 @@
           type="text"
           name="address"
           placeholder="Address.."
+          required
         />
       </div>
       <div class="form-field">
@@ -61,6 +62,7 @@
           type="text"
           name="city"
           placeholder="City.."
+          required
         />
       </div>
       <div class="form-field">
@@ -69,6 +71,7 @@
           type="text"
           name="state"
           placeholder="State.."
+          required
         />
       </div>
       <div class="form-field">
@@ -77,6 +80,7 @@
           type="text"
           name="zipcode"
           placeholder="Zip code.."
+          required
         />
       </div>
       <div class="form-field">
@@ -84,29 +88,70 @@
           class="form-control"
           type="text"
           name="country"
-          placeholder="Zip code.."
+          placeholder="Country"
+          required
         />
       </div>
-    </div>
-
-    <input
-      id="form-button"
-      class="cart-button-black"
-      value="Continue"
-      type="submit"
-    />
+      <button
+        id="form-button"
+        class="cart-button-black"
+        value="Continue"
+        type="submit"
+      >
+        Continue
+      </button>
+  </div>
   </form>
+  
+  <!-- END OF FORM -->
+  <!-- PAYMENT OPTIONS ---------------------------------------------------------->
+  <section id="payment-info" class="hidden">
+    <!-- LEFT -->
+
+    <div class="left-payment-child">
+      <div class="payment-form">
+        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Cash On Delivery</button>
+        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">iDEAL/PayPal/Google Pay/Klarna</button>
+        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Net Banking</button>
+        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Debit / Credit Card</button>
+      </div>
+
+      <div style="margin-bottom: 25px;">
+        <ul class="payment-icons">
+          <li><i class="fa-brands fa-cc-visa"></i></li>
+          <li><i class="fa-brands fa-cc-mastercard"></i></li>
+          <li><i class="fa-brands fa-amazon"></i></li>
+          <li><i class="fa-brands fa-paypal"></i><i class="fa-brands fa-paypal"></i></li>
+          <li><i class="fa-brands fa-google-pay"></i></li>
+        </ul>
+      </div>
+    </div>
+    <!-- END OF LEFT -->
+  </section>
+  <!-- END OF PAYMENT OPTIONS ---------------------------------------------------------->
 </div>
-<br />
-<!-- END OF FORM -->
 
-<!-- PAYMENT OPTIONS ---------------------------------------------------------->
-<section id="payment-info" class="hidden">
-  <small>Paypal Options</small>
-  <button id="make-payment">Make Payment</button>
+
+<section id="confirmed" class="confirmed hidden">
+<!-- CONFIRMED ---------------------------------------------------------->
+    <!-- HEADING -->
+
+    <h1 class="confirmed-heading">RECIEVED <i class="fa-sharp fa-solid fa-check-double"></i></h1><br>
+
+    <!-- ORDER NUMBER -->
+    <span>Order ID: 1682366957-481252</span> <br>
+
+    <!-- TRUCK IMAGE -->
+    <img class="delivery-truck" src="{% static 'images/mail-truck.svg' %}" alt="Delivery truck" /><br>
+
+    <!-- DATE -->
+    <h4>Estimated Delivery</h4><br>
+    <h3 class="delivery-date">Saturday, 29th April, 2023</h3><br>
+
+    <!-- BUTTON -->
+
+    <a class="continue-shopping-btn btn-secondary" href="{% url 'store' %}">Continue Shopping &#8594</a>
 </section>
-<!-- END OF PAYMENT OPTIONS ---------------------------------------------------------->
-
 <!-- javascript -->
 <script type="text/javascript">
   var shipping = "{{ order.shipping }}";
@@ -114,15 +159,25 @@
 
   if (shipping == "False") {
     document.getElementById("shipping-info").innerHTML = "";
+    document.getElementById("digital-false").classList.add("current");
+    document.getElementById("digital-true").classList.remove("current");
+    document.getElementById("checkout-current").textContent =
+      "Digital Product Payment";
+    document.getElementById("user-info").classList.add("hidden");
+    document.getElementById("payment-info").classList.remove("hidden");
   }
 
   if (user != "AnonymousUser") {
     document.getElementById("user-info").innerHTML = "";
+    document.getElementById("digital-false").classList.add("current");
+    document.getElementById("digital-true").classList.remove("current");
   }
 
   if (shipping == "False" && user != "AnonymousUser") {
     // Hide entire form if user is logged in and shipping is false
     document.getElementById("form-wrapper").classList.add("hidden");
+    document.getElementById("digital-false").classList.remove("current");
+    document.getElementById("digital-true").classList.add("current");
     // Show payment if logged in user wants to buy an item that does not
     // require shipping
     document.getElementById("payment-info").classList.remove("hidden");
@@ -131,22 +186,53 @@
   var form = document.getElementById("form");
 
   csrftoken = form.getElementsByTagName("input")[0].value;
-  console.log("Newtoken:", form.getElementByTagName("input")[0].value);
+  console.log("Newtoken:", csrftoken);
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     console.log("Form submitted...");
     document.getElementById("form-button").classList.add("hidden");
+    document.getElementById("form").classList.add("hidden");
+    document.getElementById("checkout-current").textContent = "Select Payment";
     document.getElementById("payment-info").classList.remove("hidden");
+    document.getElementById("digital-false").classList.remove("current");
+    document.getElementById("digital-true").classList.add("current");
+    
   });
+  function confirmed() {
+    confirmed = document.getElementById("confirmed").classList.remove("hidden");
+    confirmed = document.getElementById("payment-info").classList.add("hidden");
+
+    document
+      .getElementById("cash-on-delivery")
+      .addEventListener("click", (e) => {
+        console.log("Cash on delivery clicked");
+        confirmed();
+      });
+  }
 
   document
     .getElementById("make-payment")
     .addEventListener("click", function (e) {
+      e.preventDefault()
+      document.getElementById("checkout-current").textContent = "Order Confirmed!";
+      document.getElementById("shipping-info").classList.add("hidden");
+      alert("Your payment was recieved!");
+
+      cart = {};
+      document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
+
       submitFormData();
     });
   function submitFormData() {
-    console.log("Payment button clicked");
+    console.log("Started processing payment...");
+    document.getElementById("confirmed").classList.remove("hidden");
+    document.getElementById("payment-info").classList.add("hidden");
+    document.getElementById("payment-info").classList.add("hidden");
+    document.getElementById("digital-false").classList.remove("current");
+    document.getElementById("digital-true").classList.remove("current");
+    document.getElementById("confirmed-true").classList.add("current");
+
 
     var userFormData = {
       name: null,
@@ -159,6 +245,7 @@
       city: null,
       state: null,
       zipcode: null,
+      country: null,
     };
 
     if (shipping != "False") {
@@ -166,6 +253,7 @@
       shippingInfo.city = form.city.value;
       shippingInfo.state = form.state.value;
       shippingInfo.zipcode = form.zipcode.value;
+      shippingInfo.country = form.zipcode.value;
     }
 
     if (user == "AnonymousUser") {
@@ -173,18 +261,18 @@
       userFormData.email = form.email.value;
     }
 
-    var url = "/process_order/";
+    var url = "/processOrder/";
     fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrftoken,
       },
-      body: JSON.stringify({ form: userFormData, shipping: shippingInfo }),
+      body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo }),
     })
       .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
+      .then((response) => {
+        console.log("Success:", response);
         alert("Transaction completed");
 
         cart = {};
