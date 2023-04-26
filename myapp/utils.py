@@ -1,5 +1,6 @@
 import json
 from . models import *
+import http.client
 
 def cookieCart(request):
     try:
@@ -59,8 +60,6 @@ def cartData(request):
         items = cookieData['items']
     return {'cartItems': cartItems, 'order': order, 'items': items}
 
-
-
 def guestOrder(request, data):
     print('User is not logged in..')
         
@@ -91,3 +90,17 @@ def guestOrder(request, data):
             quantity=item['quantity'],
         )
     return customer, order
+
+# Brands Page
+
+# function for returning 'Akiba Studio'
+# from the description of the product
+def search_items(data):
+    result = []
+    for item in data:
+        if 'Akiba Studio' in item:
+        # if 'Trucker Hat' in item or 'Akiba Studio' in item:
+            result.append(item)
+    return result
+
+# End of Brands Page
