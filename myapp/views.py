@@ -1,21 +1,25 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 import json
 import datetime
 from .models import *
-from . utils import cookieCart, cartData, guestOrder
-from django.core.exceptions import ObjectDoesNotExist
-import os
-from django.db import models
-from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required 
+from . utils import cookieCart, cartData, guestOrder, search_items
+from . api import spotify, mixcloud
+import http.client
+from django.contrib.auth.decorators import user_passes_test
 
 
 # ERROR - DONE
 def error(request):
     print("Error 404")
-    error_message = "There seems to be an error here"
-    return render(request, 'error.html', {"error_message": error_message})
+    
+    retry_link = ""
+    error_message = ""
+    
+    context = {'retry_link': retry_link,
+                'error_message': error_message,
+                }
+    return render(request, 'error.html', context)
 # END OF ERROR - DONE
 
 # ABOUT US
@@ -53,7 +57,7 @@ def help(request):
 
 # DASHBOARD
 
-@login_required(login_url='signup')
+@user_passes_test(lambda u: u.is_superuser)
 def dashboard(request):
     products = Product.objects.all()
     blogs = Blog.objects.all()
@@ -72,18 +76,19 @@ def dashboard(request):
 def index(request):
     products = Product.objects.all()
     blogs = Blog.objects.all()
-
+    
     data = cartData(request)
     cartItems = data['cartItems']
     
-    # Hot Sale Section
-    hot_sale_image = Product.objects.get(id=13)
-    # End of Hot Sale Section
-
+    if request.method == 'POST':
+        email = request.POST.get('email', '')
+        newsletter_subscriber = Newsletter(email=email)
+        newsletter_subscriber.save()
+        print(f"{email} subscribed to our newsletter from the homepage!")
+    
     context = {'products': products, 
                 'blogs': blogs, 
                 'cartItems': cartItems,
-                'hot_sale_image': hot_sale_image.imageURL,
                 }
     return render(request, 'index.html', context)
 
@@ -107,6 +112,29 @@ def store(request):
                 }
     return render(request, 'store.html', context)
 
+
+def brand(request):
+    page_name = f"| Brands"
+    
+    list_of_brand_products = Product.objects.filter(brand=brand)
+    list_of_brand_blogs = Blog.objects.filter(brand=brand)
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+
+    recent_products = Product.objects.order_by('-pk')
+    recent_blogs = Blog.objects.order_by('-pk')
+    products = Product.objects.all()
+
+    context = {'products': products, 
+                'page_name': page_name,
+                'cartItems': cartItems,
+                'recent_products': recent_products,
+                'recent_blogs': recent_blogs,
+                'list_of_brand_products': list_of_brand_products,
+                'list_of_brand_blogs': list_of_brand_blogs,
+                }
+    return render(request, 'brand.html', context)
 # CART
 
 def cart(request):
@@ -117,7 +145,7 @@ def cart(request):
     cartItems = data['cartItems']
     order = data['order']
     items = data['items']
-    
+
 
     context = {
                 'page_name': page_name,
@@ -168,6 +196,9 @@ def product_detail(request, pk):
     url_name = '-'.join(words)
     dynamic_url = f"/product/{pk}/{url_name}/"
 
+    
+    imgURL = product.imageURL
+    
     colors = Product.objects.values('available_colors').distinct()
 
     context = {
@@ -177,6 +208,7 @@ def product_detail(request, pk):
             'shop':shop,
             'colors': colors,
             'cartItems': cartItems,
+            'imgURL':imgURL,
             }
         
     return render(request, 'product_detail.html', context)
@@ -185,18 +217,57 @@ def product_detail(request, pk):
 def blog_list(request):
     blogs = Blog.objects.all()
     page_name = f"| Blogs"
-    return render(request, 'blog_list.html', {'blogs': blogs,
-                                                'page_name': page_name
-                                                })
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
+    context = {
+        'cartItems': cartItems,
+        'blogs': blogs,
+        'page_name': page_name
+        }
+    return render(request, 'blog_list.html', context)
 
 def blog_detail(request, pk):
     blog = get_object_or_404(Blog, pk=pk)
     page_name = f"| {blog.title}"
-    context = {'blog': blog, 'page_name': page_name}
-    return render(request, 'blog_detail.html', context)
     
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
+    context = {
+        'blog': blog, 
+        'page_name': page_name,
+        'cartItems': cartItems
+        }
+    return render(request, 'blog_detail.html', context)
+
 def signup(request):
-    return render(request, 'signup.html')
+    page_name = f"| Log In/Sign Up"
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        signup = SignUp(username=username,
+                        password=password
+                        )
+        signup.save()
+        print('New signup!')
+        
+        context = {
+            'page_name': page_name, 
+            'cartItems': cartItems
+            }
+        
+        return redirect('index.html', context)
+    context = {
+        'cartItems': cartItems,
+        'page_name': page_name,
+        }
+    return render(request, 'signup.html', context)
 
 # WISHLIST
 def wishlist(request):
@@ -216,34 +287,61 @@ def wishlist(request):
     return render(request, 'wishlist.html', context)
 # END OF WISHLIST
 
-
 # BRAND
 def brands(request):
     page_name = f"| Brands"
     
+    products = Product.objects.all()
+    blogs = Blog.objects.all()
+    
+    brands_list = set(Product.objects.values_list('shop', flat=True))
+    categories = set(Product.objects.values_list('description', flat=True)) # add more categories as needed
+    keywords = categories
+
+    # print(keywords)
+    # data = {'KINYOZI Salon Street', 'OX Sheep bucket', 'Red stylish bucket hat by akiba studios', 'Stylish bucket hat', 'Cool vibes, Akiba Studio with a new Tropical, Hawaii theme', 'Black pants with RED AK embroidery', 'Blue Top, Ladies', 'White trucker hat from Akiba Studios', 'Farm boyz blue shirt', 'Stay cozy with our “World Wide Web” knit pullover Featuring our “spider web” embroidery', 'Stylish akiba asorted hats', 'Black Akiba Pants with AK embroidery', 'NFT wallpaper playing playstation', 'Akiba front side trucker hat', 'Yellow stylish bucket hat for summer with cartoon embroidery on front side.', 'Introducing our latest print Kintsungi graphic print and a scattered poem inspired by the Kintsungi philosophy', 'Black half jacket by Akiba Studios, Street Fashion', 'FARM BOYZ 1 - Pink Blue Jersey', 'Black pants with ORANGE AK embroidery', 'Green lukustore.nl limiteed edition of the bucket hat', 'Blue Akiba Studios Bucket Hat for summer'}
+    akiba_studios_products = search_items(keywords)
+    # Products from akiba studios printed on the terminal
+
+
+    
     data = cartData(request)
     cartItems = data['cartItems']
-    
-    brands = set(Product.objects.values_list('shop', flat=True))
-    context = {'brands': brands, 
+
+    context = {'brands_list': brands_list, 
                 'page_name': page_name,
-                'cartItems': cartItems,
+                'cartItems': cartItems, 
+                'categories': categories,
+                'keywords': keywords,
+                'akiba_studios_products': akiba_studios_products,
+                'blogs': blogs,
+                'products': products,
                 }
     return render(request, 'brands.html', context)
 # END OF BRAND
-
-@csrf_exempt
+    
 def newsletter(request):
     page_name = f" | Newsletter Subscription"
+    
     if request.method == 'POST':
-        email = request.POST.get('email')
-        
-        if email:
-            newsletter_subscriber = Newsletter.objects.create(email=email)
+        email = request.POST.get('email', '')
+        newsletter_subscriber = Newsletter.objects.filter(email=email).first()
+        if newsletter_subscriber:
+            # The email is already subscribed, so unsubscribe it
+            newsletter_subscriber.delete()
+            message = 'You have successfully unsubscribed from our newsletter!'
+            print(f"{email} unsubscribed from our newsletter.")
+        else:
+            # Subscribe the email to the newsletter
+            print(f"{email} Subscribed from our newsletter.")
+            newsletter_subscriber = Newsletter(email=email)
             newsletter_subscriber.save()
-            return JsonResponse({'success': True})
-        
-    return JsonResponse({'success': False})
+            message = 'Thank you for subscribing to our newsletter!'
+            
+        return render(request, 'index.html', {'message': message, 'page_name': page_name,})
+    else:
+        return render(request, 'newsletter.html')
+
 
 
 # cart update item view
@@ -278,6 +376,9 @@ def updateItem(request):
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
     
+     # Initialize data variable
+    data = json.loads(request.body)
+    
     if request.user.is_authenticated:
         customer = request.user.customer
         data = json.loads(request.body)
@@ -302,9 +403,20 @@ def processOrder(request):
                 state=data['shipping']['state'],
                 zipcode=data['shipping']['zipcode'],
             )
+        print("Shipping Details Recieved!")
+        message = 'Shipping Details!'
 
+    
+    return render(request, 'order-confirmed.html', {'message': message})
 
-    return JsonResponse('Payment submitted!', safe=False)
+def order_confirmed(request):
+    page_name = f'| Order confirmed'
+    
+    message = ''
+    context = {'page_name': page_name,
+                'message': message,
+                }
+    return render(request, 'order-confirmed', context)
 
 def addProduct(request):
     
@@ -329,3 +441,37 @@ def addProduct(request):
     
     context = { 'page_name': page_name}
     return render(request, 'add_product.html', context)
+
+def api(request):
+    page_name = f'| api'
+    
+    # spot = spotify_playlist(request)
+
+    
+    lyrics = spotify(request)
+    kwargs = lyrics['kwargs']
+    
+    mixcloud_api = mixcloud(request)
+    
+    
+    print(mixcloud_api)
+    
+    context = {
+        'page_name': page_name,
+        'mixcloud_api': mixcloud_api,
+        'kwargs': kwargs,
+    }
+    return render(request, 'api.html', context)
+
+def delete(request, pk):
+    page_name = f"| Deleted!"
+    
+    if request.method == "POST":
+        product = Product.objects.get(pk=pk)
+        product.delete()
+        return redirect("dashboard /")
+    
+    context = { 
+                'page_name': page_name
+            }
+    return render(request, 'delete.html', context)
