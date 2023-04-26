@@ -11,7 +11,10 @@
 <div class="main-container">
   <section class="product-left">
     <div class="images">
-      <img src="{{ product.imageURL }}" alt="{{ product.name }}" />
+      <a class="gfg-img" href="{{ imgURL }}">
+        <img src="{{ product.imageURL }}" alt="{{ product.name }}"
+      /></a>
+      <div class="zoom-preview"></div>
     </div>
   </section>
 
@@ -37,7 +40,7 @@
             data-product="{{ product.pk }}"
             data-action="add"
             class="buy-now-btn btn-primary update-cart"
-            href="{% url 'checkout' %}"
+            href="{% url 'cart' %}"
             >Add to cart</a
           >
         </div>
@@ -67,4 +70,26 @@
     </div>
   </section>
 </div>
+<script>
+  var img = document.getElementById("gfg-img");
+  var preview = document.querySelector(".zoom-preview");
+
+  //calculating the ratio by which we want to magnify the image
+  //you can increase or decrease it according to your requirement
+  var x = preview.offsetWidth / 100;
+  var y = preview.offsetHeight / 100;
+
+  img.addEventListener("mousemove", (e) => {
+    preview.style.backgroundImage = "";
+    preview.style.backgroundSize =
+      img.width * x + "px " + img.height * y + "px";
+    var posX = e.offsetX;
+    var posY = e.offsetY;
+    preview.style.backgroundPosition =
+      "-" + posX * x + "px -" + posY * y + "px";
+  });
+  img.addEventListener("mouseout", () => {
+    preview.style.backgroundImage = "none";
+  });
+</script>
 {% endblock %}
