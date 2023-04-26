@@ -1,0 +1,46 @@
+{% extends 'base.html' %}{% load static %}{% block body %}
+
+<div>
+  <section class="luku-container"></section>
+</div>
+<section class="parent-container">
+  <!-- CONTENT -->
+  <article class="left-child">
+    <div class="content">
+      <h1 class="page-title">Luku Fam</h1>
+      {% for s in summary|slice:":1" %}
+      <p class="summary">{{ s.summary }}</p>
+      {% endfor %}
+
+      <!-- END OF CONTENT -->
+
+      <!-- NUMBERS -->
+      <div class="numbers">
+        <!-- 1st Number -->
+        <div class="50k">
+          <h1>4</h1>
+          <span>Luku Fam Team</span>
+        </div>
+        <!-- end of 1st number -->
+
+        <!-- 2nd Number -->
+        <div class="60plus">
+          <h1>3+</h1>
+          <span>Top Partners</span>
+        </div>
+        <!-- end of 2nd Number -->
+
+        <!-- 3rd Number -->
+        <div class="5plus">
+          <h1>2+</h1>
+          <span>Countries Covered</span>
+        </div>
+        <!-- end of 3rd Number -->
+      </div>
+      <!-- END OF NUMBERS -->
+    </div>
+  </article>
+  <article class="right-child"></article>
+</section>
+
+{% endblock %}

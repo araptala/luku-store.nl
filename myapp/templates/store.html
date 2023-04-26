@@ -1,0 +1,31 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<section class="shop">
+  <h1 style="font-size: 3rem;"><i style="margin-right: 10px;" class="fa-solid fa-shop"></i>Shop</h1>
+  <main>
+    <section class="shop-section">
+      {% for product in recent_products %}
+      <div>
+        <a class="product-view-link" href="{% url 'product_detail' product.pk %}">
+          <img class="thumbnail" src="{{ product.imageURL }}" alt="" />
+          <hr style="margin: 10px 0px 10px 0px;" />
+          <div>
+            <h3>{{ product.name }}</h3></a>
+            <p class="description">{{ product.description }}</p>
+            <h4 class="product-details-group">
+            Price: 
+            € {{ product.price }}<i class="wishlist fa-regular fa-heart"></i>
+            </h4>
+          </div>
+          <button 
+                data-product="{{ product.pk }}"
+                data-action="add"
+                class="add-btn update-cart addToCartBtn"
+              >
+              Add to <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+      </div>
+      {% endfor %}
+    </section>
+  </main>
+</section>
+{% endblock %}

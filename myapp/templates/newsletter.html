@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% block body %}
+
+<section class="newsletter-page">
+  <form id="newsletter" method="POST">
+    <h1>Lukustore Newsletter</h1>
+
+    <div class="newsletter">
+      <span class="footer-title">Stay up to date</span>
+      <p>
+        Subscribe to recieve updates, access to exclusive deals, our newsletter
+        and more.
+      </p>
+      <input
+        id="newsletter-input"
+        class="newsletter-input"
+        type="email"
+        placeholder="Email Address"
+      />
+      <button style="margin-top: 25px" class="btn-secondary" type="submit">
+        Submit
+      </button>
+    </div>
+  </form>
+</section>
+{% endblock %}

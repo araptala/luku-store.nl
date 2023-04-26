@@ -1,0 +1,27 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+
+<section class="blog-parent">
+  <div class="blog-top">
+    <h1>{{ blog.title }}</h1>
+    {{ blog.pub_date|date:"F j, Y" }}
+    <p>{{ blog.summary }}</p>
+  </div>
+  <div class="blog-media">
+    {% if blog.youtube %}
+    <iframe
+      width="720"
+      height="420"
+      src="https://www.youtube.com/embed/XppZqa0BtoQ"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+    {% elif blog.image %}
+    <img src="{{ blog.imageURL }}" alt="{{ blog.name }}" />
+    {% endif %}
+  </div>
+  <article>{{ blog.content|safe }}</article>
+</section>
+
+{% endblock %}

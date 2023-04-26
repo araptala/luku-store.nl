@@ -1,0 +1,190 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Luku Store</title>
+
+    <!-- Montseratt Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Material UI -->
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outline"
+      rel="stylesheet"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'dashboard.css' %}"
+    />
+  </head>
+  <body>
+    <div class="grid-container">
+      <!-- header -->
+      <header class="header">
+        <!-- <div class="menu-icon" onclick="openSidebar()"> -->
+        <div class="menu-icon btn">
+          <span class="material-symbols-outlined"> menu </span>
+        </div>
+        <div class="header-left btn">
+          <span class="material-symbols-outlined"> search </span>
+          <input
+            style="margin-left: 5px"
+            class="search-box"
+            placeholder="Search..."
+            type="text"
+          />
+        </div>
+        <div class="header-right">
+          <span style="margin-right: 5px" class="material-symbols-outlined btn">
+            notifications
+          </span>
+          <span style="margin-right: 5px" class="material-symbols-outlined btn">
+            email
+          </span>
+          <span class="material-symbols-outlined btn"> account_circle </span>
+        </div>
+      </header>
+      <!-- end of header -->
+
+      <!-- sidebar -->
+      <aside id="sidebar">
+        <div class="sidebar-title">
+          <div class="sidebar-brand">
+            <span class="material-symbols-outlined"> inventory_2 </span>
+            Luku Store
+          </div>
+          <span class="material-symbols-outlined" onclick="closeSidebar()">
+            close
+          </span>
+        </div>
+
+        <ul class="sidebar-list">
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> dashboard </span> Dashboard
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> inventory </span>
+            Products
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> fact_check </span>
+            Inventory
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> add_shopping_cart </span>
+            Purchase Orders
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> shopping_cart </span> Sales
+            Orders
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> poll </span> Reports
+          </li>
+          <li class="sidebar-list-item">
+            <span class="material-symbols-outlined"> settings </span> Settings
+          </li>
+        </ul>
+      </aside>
+      <!-- end of sidebar -->
+
+      <!-- main -->
+      <main class="main-container">
+        <div class="main-title">
+          <p class="font-weight-bold">DASHBOARD</p>
+        </div>
+
+        <div class="main-cards">
+          <div id="products-card" class="card">
+            <a
+              style="text-decoration: none; color: inherit"
+              href="{% url 'store' %}"
+            >
+              <div class="card-inner">
+                <p class="text-primary">PRODUCTS</p>
+                <span class="material-symbols-outlined"> inventory </span>
+              </div>
+              <span class="text-primary font-weight-bold"
+                >{{ total_products }}</span
+              >
+            </a>
+          </div>
+
+          <div class="card">
+            <a
+              style="text-decoration: none; color: inherit"
+              href="{% url 'blog_list' %}"
+            >
+              <div class="card-inner">
+                <p class="text-primary">TOTAL BLOGS</p>
+                <span class="material-symbols-outlined">
+                  collections_bookmark
+                </span>
+              </div>
+              <span class="text-primary font-weight-bold"
+                >{{ total_blogs }}</span
+              >
+            </a>
+          </div>
+          <div class="card">
+            <div class="card-inner">
+              <p class="text-primary">Sale</p>
+              <span class="material-symbols-outlined"> shopping_cart </span>
+            </div>
+            <span class="text-primary font-weight-bold">39</span>
+          </div>
+          <div class="card">
+            <div class="card-inner">
+              <p class="text-primary">INVENTORY ALERTS</p>
+              <span class="material-symbols-outlined">
+                notification_important
+              </span>
+            </div>
+            <span class="text-primary font-weight-bold">3</span>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts">
+          <div class="charts-card">
+            <p class="chart-title">Top 5 Products</p>
+            <div id="bar-chart"></div>
+          </div>
+
+          <div class="charts-card">
+            <p class="chart-title">Purchase and Sales Orders</p>
+            <div id="area-chart"></div>
+          </div>
+        </div>
+      </main>
+      <!-- end of main -->
+    </div>
+    <!-- javascript -->
+    <!-- Apex Charts -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.37.1/apexcharts.min.js"
+      integrity="sha512-hl0UXLK2ElpaU9SHbuVNsvFv2BaYszlhxB2EntUy5FTGdfg9wFJrJG2JDcT4iyKmWeuDLmK+Nr2hLoq2sKk6MQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{% static 'js/dashboard.js' %}"
+    ></script>
+  </body>
+</html>

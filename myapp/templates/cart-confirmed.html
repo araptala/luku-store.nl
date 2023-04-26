@@ -1,0 +1,26 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+
+<section class="confirmed">
+<!-- CONFIRMED ---------------------------------------------------------->
+    <!-- HEADING -->
+
+    <h1 class="confirmed-heading">CONFIRMED <i class="fa-sharp fa-solid fa-check-double"></i></h1><br>
+
+    <!-- NOTE -->
+    <h3 class="confirmed-note">THANK YOU FOR YOUR ORDER!</h3><br>
+
+    <!-- ORDER NUMBER -->
+    <span>Order ID: 56089</span> <br>
+
+    <!-- TRUCK IMAGE -->
+    <img class="delivery-truck" src="{% static 'images/mail-truck.svg' %}" alt="Delivery truck" /><br>
+
+    <!-- DATE -->
+    <h4>Estimated Delivery</h4><br>
+    <h3 class="delivery-date">Monday, 9th April, 2023</h3><br>
+
+    <!-- BUTTON -->
+
+    <a class="continue-shopping-btn btn-secondary" href="{% url 'product_list' %}">Continue Shopping &#8594</a>
+</section>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html' %}{% load static %} {% block body %}
+
+<article>
+  <p class="bread-crumbs">
+    <a class="bread-crumbs-link underline" href="{% url 'store' %}">Shop</a>
+    / {{product.shop}} /
+    <strong>{{product.name}}</strong>
+  </p>
+</article>
+
+<div class="main-container">
+  <section class="product-left">
+    <div class="images">
+      <img src="{{ product.imageURL }}" alt="{{ product.name }}" />
+    </div>
+  </section>
+
+  <section class="right">
+    <div class="details">
+      <div class="details-group">
+        <h3 class="product-name-details">{{ product.name }}</h3>
+        <p class="description">
+          {{ product.description }}
+          <span class="size">{{ product.sizes|upper }}</span>
+        </p>
+      </div>
+
+      <div class="details-group">
+        <div class="price-group">
+          <h3 class="price">€{{ product.price }}</h3>
+        </div>
+      </div>
+
+      <div class="details-group">
+        <div class="details-buttons buttons">
+          <a
+            data-product="{{ product.pk }}"
+            data-action="add"
+            class="buy-now-btn btn-primary update-cart"
+            href="{% url 'checkout' %}"
+            >Add to cart</a
+          >
+        </div>
+      </div>
+
+      <div class="details-group delivery-details">
+        <div class="delivery">
+          <div class="delivery-div">
+            <i class="fa-solid fa-truck"></i>
+            <h5>Free Delivery</h5>
+          </div>
+          <a class="postal-code-link" href="#"
+            >Enter your Postal code for Delivery Availability</a
+          >
+        </div>
+        <hr />
+        <div class="delivery">
+          <div class="delivery-div">
+            <i class="fa-solid fa-truck-ramp-box"></i>
+            <h5>Return Delivery</h5>
+          </div>
+          <a class="return-delivery-code-link" href="#"
+            >Free 30days Delivery Returns. Details.</a
+          >
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

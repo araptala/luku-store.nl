@@ -1,0 +1,32 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<section class="shop">
+  <h1 style="margin-top: 25px; font-size: 2.5rem;">Wishlist</h1>
+  <small>A list of <strong>4</strong> special (popular & digital) products</small>
+  <div class="shop-section">
+    {% for product in products %}
+    {% if product.popular %}
+    <div>
+      <a class="product-view-link" href="{% url 'product_detail' product.pk %}">
+        <img class="thumbnail" src="{{ product.imageURL }}" alt="" />
+        <hr style="margin: 10px 0px 10px 0px;" />
+        <div>
+          <h3>{{ product.name }}</h3></a>
+          <p class="description">{{ product.description }}</p>
+          <h4 class="product-details-group">
+          Price: 
+          € {{ product.price }}<i class="wishlist fa-regular fa-heart"></i>
+          </h4>
+        </div>
+        <button 
+              data-product="{{ product.pk }}"
+              data-action="add"
+              class="add-btn update-cart addToCartBtn"
+            >
+            Add to <i class="fa-solid fa-cart-shopping"></i>
+          </button>
+      </div>
+      {% endif %}
+      {% endfor %}
+  </div>
+</section>
+{% endblock %}

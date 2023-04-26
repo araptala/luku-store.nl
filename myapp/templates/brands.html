@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% load static %} {% block body %}
+<ul>
+  {% for brand in brands %}
+  <li>{{ brand }}</li>
+  {% empty %}
+  <li>No brands found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

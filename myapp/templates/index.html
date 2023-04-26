@@ -1,0 +1,224 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<!-- -------------------- -->
+<!-- -------------------- -->
+
+<!-- HERO SECTION -->
+<section id="current" class="hero">
+  <article class="hero-title-box">
+    <h1 class="hero-main-title">
+      Streetwear is an artistic movement. <br />
+      It’s a creative process.
+    </h1>
+    <div>
+      <a class="btn-primary underline" href="{% url 'store' %}"
+        >SS23' Lukubook</a
+      >
+      <a class="btn btn-secondary" href="{% url 'store' %}">Shop Now &#8599;</a>
+    </div>
+  </article>
+</section>
+
+<!-- END OF HERO SECTION -->
+
+<!-- -------------------- -->
+<!-- -------------------- -->
+<!--  SECTION -->
+  <div class="winter-heading">
+    <h3 class="index-heading">Winter 23/24 Collection</h3>
+    <p class="winter-sub-heading">
+      Check out our summer collection from local designers in Kenya, Africa.
+    </p>
+  </div>
+  <!-- End of Winter Heading -->
+
+<div id="winter-section" class="winter-section">
+  <!-- Winter Heading -->
+  <section class="winter-inner-section">
+    <!-- 1st Block -->
+    <div class="new-release-div">
+      <h2>New Release</h2>
+      <p>OX 2023 Collection</p>
+      <div class="new-release-buttons">
+        <a href="{% url 'store' %}">Men Shop &#8599;</a>
+        <a href="{% url 'store' %}">Women Shop &#8599;</a>
+      </div>
+    </div>
+    <!-- End of 1st Block -->
+
+    <!-- 2nd Block -->
+    <div class="mid-div">
+      <div class="sweater-div"><a class="underline" href="{% url 'store' %}">Sweater</a></div>
+      <div class="jacket-div"><a class="underline" href="{% url 'store' %}">Jacket</a></div>
+    </div>
+    <!-- End of 2nd Block -->
+
+    <!-- 3rd Block -->
+    <div class="trucker-div">
+      <a class="underline" href="{% url 'store' %}"
+        >Trucker <br />
+        Hats</a
+      >
+    </div>
+    <!-- End of 3rd Block -->
+  </section>
+</div>
+
+<!-- END OF  SECTION -->
+
+<!-- -------------------- -->
+<!-- -------------------- -->
+
+<!-- LUKU DEFINITION -->
+<div id="definition">
+  <section class="definition">
+    <h1>luku</h1>
+    <em>/ loo-koo /</em>
+    <p>
+      <strong>(n.)</strong>
+      a magical power possessed by stylish Kenyan clothing that makes you feel
+      like you can conquer the world while also doing good for others. Example:
+      "I put on my new dress from Kenya and suddenly I felt the luku coursing
+      through my veins! Time to take on the day with confidence!
+    </p>
+  </section>
+</div>
+<div class="horizontal-rule"></div>
+<!-- END OF LUKU DEFINITION -->
+
+<!-- -------------------- -->
+<!-- -------------------- -->
+<!-- POPULAR THIS WEEK -->
+<div id="popular-this-week" class="popular-heading">
+  <h3 class="index-heading">Popular This Week</h3>
+  <p class="popular-sub-heading">
+    Akiba is back with unique and colorful outfits that reflect the Kenyan
+    culture and lifestyle.
+  </p>
+</div>
+
+<section class="popular">
+  {% for product in products %} {% if product.popular|slice:":3" %}
+  <div>
+    <a class="product-view-link" href="{% url 'product_detail' product.pk %}">
+      <img class="thumbnail" src="{{ product.imageURL }}" alt="" />
+      <hr style="margin: 10px 0px 10px 0px;" />
+      <div>
+        <h3>{{ product.name }}</h3></a>
+        <p class="description">{{ product.description }}</p>
+        <h4 class="product-details-group">
+        Price: 
+        €{{ product.price }}<i class="wishlist fa-regular fa-heart"></i>
+        </h4>
+      </div>
+      <button 
+            data-product="{{ product.pk }}"
+            data-action="add"
+            class="add-btn update-cart addToCartBtn"
+          >
+          Add to <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+  </div>
+  {% endif %} {% endfor %}
+</section>
+
+<article class="site-numbers">
+  <div class="customers-number">
+    <h2>2,500+</h2>
+    <span>Customers</span>
+  </div>
+
+  <div class="monthly-blog">
+    <h2>5,500+</h2>
+    <span>Monthly Blog Readers</span>
+  </div>
+
+  <div class="countries">
+    <h2>10+</h2>
+    <span>Countries</span>
+  </div>
+</article>
+
+<!-- END OF POPULAR THIS WEEK -->
+<!-- -------------------- -->
+<!-- -------------------- -->
+
+<!-- BLOG SECTION -->
+<div class="horizontal-rule"></div>
+<div id="index-blog" class="blog-heading">
+  <h3 class="index-heading">Blog Posts</h3>
+</div>
+<section class="index-blog-container">
+  <!-- LATEST BLOG -->
+  {% for blog in blogs|slice:":1" %}
+  <article class="index-blog-item">
+    <iframe
+      class="index-blog-image"
+      src="https://www.youtube.com/embed/XppZqa0BtoQ"
+      title="YouTube video player"
+      frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      allowfullscreen
+    ></iframe>
+
+    <a class="index-blog-title underline" href="{% url 'blog_detail' blog.pk %}"
+      >{{ blog.title }}</a
+    >
+    <p class="index-blog-summary">
+      {{ blog.summary }}
+      <a class="underline" href="{% url 'blog_detail' blog.pk %}"
+        ><br />
+        Read more ...</a
+      >
+    </p>
+  </article>
+  {% endfor %}
+
+  <!-- END OF LATEST BLOG -->
+
+  <!-- OTHER BLOG -->
+  {% for blog in blogs|slice:"1:3" %}
+  <article class="index-blog-item">
+    {% if blog.image %}
+    <a class="index-blog-title underline" href="{% url 'blog_detail' blog.pk %}"
+      >
+    <img
+      src="{{ blog.imageURL }}"
+      alt="{{ blog.name }}"
+    />
+    {% endif %}
+    {{ blog.title }}</a
+    >
+    <p class="index-blog-summary">
+      {{ blog.summary }}
+      <a class="read-blog underline" href="{% url 'blog_detail' blog.pk %}"
+        ><br />
+        Read more ...</a
+      >
+    </p>
+  </article>
+  {% endfor %}
+  <!-- END OF OTHER BLOG -->
+</section>
+<a class="read-more underline" href="{% url 'blog_list' %}"
+  >More Blogs &#8594;</a
+>
+
+<div class="horizontal-rule"></div>
+
+<!-- END OF BLOG SECTION -->
+<!-- -------------------- -->
+<!-- -------------------- -->
+
+<!-- HOT SALE -->
+<section id="hot-sale" class="hot-sale" >
+  <a class="hot-sale-link underline" href="{% url 'store' %}"
+    >Explore Akiba <br />
+    Trucker Hats &#8594;</a
+  >
+</section>
+
+<!-- END OF HOT SALE -->
+<!-- -------------------- -->
+<!-- -------------------- -->
+
+{% endblock %}

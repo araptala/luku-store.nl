@@ -1,0 +1,16 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<div class="help">
+  <p id="privacyPolicy">{{ help.privacy_policy|safe }}</p>
+
+  <p id="termsOfService">{{ help.terms_of_service|safe }}</p>
+
+  <p id="faqs">{{ help.faqs|safe }}</p>
+
+  <p id="ordersAndDelivery">{{ help.orders_n_delivery|safe }}</p>
+
+  <p id="returnAndRefundsPolicy">{{ help.return_n_refunds_policy|safe }}</p>
+
+  <p id="paymentMethods">{{ help.payment_methods|safe }}</p>
+</div>
+
+{% endblock %}

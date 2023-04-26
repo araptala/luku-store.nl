@@ -1,0 +1,40 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<main>
+  <section class="blog-section">
+    <h1>Blog Posts</h1>
+    <div class="blogs">
+      {% for blog in blogs %}
+      <div class="blog-item">
+        <a class="underline" href="{% url 'blog_detail' blog.pk %}">
+          {% if blog.youtube %}
+          <iframe
+            class="blog-list-youtube-thumbnail"
+            width="420"
+            height="240"
+            src="https://www.youtube.com/embed/XppZqa0BtoQ"
+            title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+          {% elif blog.image %}
+          <img src="{{ blog.imageURL }}" alt="{{ blog.name }}" />
+          {% endif %}
+          <p class="blog-title">{{ blog.title }}</p></a
+        >
+        <p class="blog-summary">
+          {{ blog.summary|slice:":100"}}...
+          <span
+            ><a class="underline" href="{% url 'blog_detail' pk=blog.pk %}">
+              Read more</a
+            ></span
+          >
+        </p>
+        <p class="pub-date">{{ blog.pub_date }}</p>
+        <hr />
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+</main>
+{% endblock %}
