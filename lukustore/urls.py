@@ -23,36 +23,50 @@ urlpatterns = [
     
     # Admin
     path("admin/", admin.site.urls),
+    
+    # Home page
     path('', index,name='index'),
-    
 
-    # About Us
-    path('about_us/', about_us, name='about_us'),
-    
-    # Contact Us
-    path('contact_us/', contact_us, name='contact_us'),
-    
-    # Products
+    # <---- Shop/Store - All products in store 
     path('store/', store, name='store'),
+
+    # ----- Single product view 
     path('product/<int:pk>/', product_detail, name='product_detail'),
-    # Updated URL pattern with dynamic_url
-    path('product/<int:pk>/<slug:url_name>/', product_detail, name='product_detail_dynamic'),
     
-    # Blog
+    # ----> Updated URL pattern with dynamic_url 
+    path('product/<int:pk>/<slug:url_name>/', product_detail, name='product_detail_dynamic'),
+
+    # <---- All Blogs 
     path('blog/', blog_list, name='blog_list'),
+
+    # ----> Single Blog View 
     path('blog/<int:pk>/', blog_detail, name='blog_detail'),
     
+    # About Us
+    path('about_us/', about_us, name='about_us'),
+
+    # <---- Brands 
+    path('brands/', brands, name='brands'),
+
+    # ----> Loads a single brand 
+    path('brand/<str:brand>/', brand, name='brand'),
+
     # Dashboard
     path('dashboard/', dashboard, name='dashboard'),
     
-    # Sign Up
+    # Login/Signup Page
     path('signup/', signup, name='signup'),
 
-    # Error
+    # Error 404 Page
     path('error/', error, name='error'),
     
-    # Cart
+    # <---- Cart view
     path('cart/', cart, name='cart'),
+        
+    # ----- Cart view
+    path('confirmed/', order_confirmed, name='order_confirmed'),
+    
+    # ----> Checkout view
     path('checkout/', checkout, name='checkout'),
     
     # Wishlist
@@ -63,15 +77,21 @@ urlpatterns = [
     
     # Help
     path('help/', help, name='help'),
+
+    # Updates the item to the backend 
+    path('updateItem/', updateItem, name='updateItem'),
     
-    # Brands
-    path('brands/', brands, name='brands'),
-    # path('brand/<str:brand>/', views.brand_products, name='brand_products'),
+    # Processes the data in the backend
+    path('processOrder/', processOrder, name='processOrder'),
     
-    path('update_item/', updateItem, name='update_item'),
-    path('process_order/', processOrder, name='process_order'),
-    
+    # Adds a product to the database/inventory
     path('add_product/', addProduct, name='addProduct'),
+    
+    # API
+    path('api/', api, name='api'),
+    
+    # Delete
+    path('delete/<int:pk>/', delete, name='delete'),
     
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
