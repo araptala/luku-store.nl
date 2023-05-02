@@ -1,0 +1,13 @@
+{% extends 'base.html' %} {% load static %} {% block body %}
+<section id="confirmed" class="confirmed">
+<!-- CONFIRMED ---------------------------------------------------------->
+    <!-- HEADING -->
+
+    <h1 class="confirmed-heading">ORDER COMPLETE <i class="fa-sharp fa-solid fa-check-double"></i></h1><br>
+
+    <!-- TRUCK IMAGE -->
+    <img class="delivery-truck" src="{% static 'images/mail-truck.svg' %}" alt="Delivery truck" /><br>
+
+    <a class="continue-shopping-btn btn-secondary" href="{% url 'store' %}">Continue Shopping &#8594</a>
+</section>
+{% endblock %}
