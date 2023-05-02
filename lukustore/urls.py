@@ -55,7 +55,7 @@ urlpatterns = [
     path('dashboard/', dashboard, name='dashboard'),
     
     # Login/Signup Page
-    path('signup/', signup, name='signup'),
+    path('newCustomer/', newCustomer, name='newCustomer'),
 
     # Error 404 Page
     path('error/', error, name='error'),
@@ -64,7 +64,7 @@ urlpatterns = [
     path('cart/', cart, name='cart'),
         
     # ----- Cart view
-    path('confirmed/', order_confirmed, name='order_confirmed'),
+    path('confirmed/', confirmed, name='confirmed'),
     
     # ----> Checkout view
     path('checkout/', checkout, name='checkout'),
@@ -86,9 +86,6 @@ urlpatterns = [
     
     # Adds a product to the database/inventory
     path('add_product/', addProduct, name='addProduct'),
-    
-    # API
-    path('api/', api, name='api'),
     
     # Delete
     path('delete/<int:pk>/', delete, name='delete'),
