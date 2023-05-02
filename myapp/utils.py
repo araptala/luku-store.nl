@@ -61,15 +61,15 @@ def cartData(request):
     return {'cartItems': cartItems, 'order': order, 'items': items}
 
 def guestOrder(request, data):
-    print('User is not logged in..')
-        
-    print('COOKIES:', request.COOKIES)
-    name = data['form']['name']
-    email = data['form']['email']
+    print("User is not logged in...")
+
+    print("COOKIES: ", request.COOKIES)
+    name = data ['form']['name']
+    email = data ['form']['email']
         
     cookieData = cookieCart(request)
     items = cookieData['items']
-        
+    
     customer, created = Customer.objects.get_or_create(
         email=email,
     )
@@ -77,9 +77,9 @@ def guestOrder(request, data):
     customer.save()
         
     order = Order.objects.create(
-        customer=customer,
-        status=False,
-    )
+            customer=customer,
+            complete=False,
+            )
         
     for item in items:
         product = Product.objects.get(pk=item['product']['id'])
@@ -88,7 +88,10 @@ def guestOrder(request, data):
             product=product,
             order=order,
             quantity=item['quantity'],
-        )
+            )
+        orderItem.save()  
+        print("Order Item saved")
+        print("Returning Customer and Order from the guestOrder utils function")
     return customer, order
 
 # Brands Page
