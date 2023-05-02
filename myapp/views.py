@@ -4,7 +4,6 @@ import json
 import datetime
 from .models import *
 from . utils import cookieCart, cartData, guestOrder, search_items
-from . api import spotify, mixcloud
 import http.client
 from django.contrib.auth.decorators import user_passes_test
 
@@ -57,10 +56,10 @@ def help(request):
 
 # DASHBOARD
 
-@user_passes_test(lambda u: u.is_superuser)
 def dashboard(request):
     products = Product.objects.all()
     blogs = Blog.objects.all()
+    shipping_addresses = ShippingAddress.objects.all()
     
     total_products = Product.objects.count()
     total_blogs = Blog.objects.count()
@@ -69,6 +68,7 @@ def dashboard(request):
             'blogs': blogs,
             'total_products': total_products, 
             "total_blogs": total_blogs,
+            'shipping_addresses': shipping_addresses,
             }
     return render(request, 'dashboard.html', context)
 # END OF DASHBOARD
@@ -79,7 +79,7 @@ def index(request):
     
     data = cartData(request)
     cartItems = data['cartItems']
-    
+
     if request.method == 'POST':
         email = request.POST.get('email', '')
         newsletter_subscriber = Newsletter(email=email)
@@ -105,11 +105,15 @@ def store(request):
     
     recent_products = Product.objects.order_by('-pk')
     products = Product.objects.all()
-    context = {'products': products, 
+    
+    context = { 
+                'products': products, 
                 'page_name': page_name,
                 'cartItems': cartItems,
                 'recent_products': recent_products,
+                
                 }
+    
     return render(request, 'store.html', context)
 
 
@@ -125,6 +129,7 @@ def brand(request):
     recent_products = Product.objects.order_by('-pk')
     recent_blogs = Blog.objects.order_by('-pk')
     products = Product.objects.all()
+    
 
     context = {'products': products, 
                 'page_name': page_name,
@@ -138,21 +143,23 @@ def brand(request):
 # CART
 
 def cart(request):
-    
     page_name = f"| Cart"
 
     data = cartData(request)
     cartItems = data['cartItems']
     order = data['order']
     items = data['items']
-
+    
+    products = Product.objects.all()
 
     context = {
                 'page_name': page_name,
                 'items': items,
                 'cartItems': cartItems,
                 'order': order,
+                'products': products,
             }
+    
     return render(request, 'cart.html', context)
 
 # END OF CART
@@ -174,6 +181,7 @@ def checkout(request):
                 'order': order,
                 'cartItems': cartItems,
             }
+    
     return render(request, 'checkout.html', context)
 
 # END OF CHECKOUT
@@ -248,21 +256,6 @@ def signup(request):
     data = cartData(request)
     cartItems = data['cartItems']
     
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        signup = SignUp(username=username,
-                        password=password
-                        )
-        signup.save()
-        print('New signup!')
-        
-        context = {
-            'page_name': page_name, 
-            'cartItems': cartItems
-            }
-        
-        return redirect('index.html', context)
     context = {
         'cartItems': cartItems,
         'page_name': page_name,
@@ -323,26 +316,27 @@ def brands(request):
 def newsletter(request):
     page_name = f" | Newsletter Subscription"
     
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
     if request.method == 'POST':
         email = request.POST.get('email', '')
-        newsletter_subscriber = Newsletter.objects.filter(email=email).first()
+        newsletter_subscriber = Customer.objects.filter(email=email).first()
         if newsletter_subscriber:
-            # The email is already subscribed, so unsubscribe it
-            newsletter_subscriber.delete()
-            message = 'You have successfully unsubscribed from our newsletter!'
-            print(f"{email} unsubscribed from our newsletter.")
+            return redirect('/')
         else:
             # Subscribe the email to the newsletter
             print(f"{email} Subscribed from our newsletter.")
             newsletter_subscriber = Newsletter(email=email)
             newsletter_subscriber.save()
-            message = 'Thank you for subscribing to our newsletter!'
-            
-        return render(request, 'index.html', {'message': message, 'page_name': page_name,})
-    else:
-        return render(request, 'newsletter.html')
+        return redirect('/')
 
+    context = {
+                'page_name': page_name,
+                'cartItems': cartItems,
+                }
 
+    return render(request, 'newsletter.html', context)
 
 # cart update item view
 
@@ -357,7 +351,6 @@ def updateItem(request):
     product = Product.objects.get(id=productId)
     order, created = Order.objects.get_or_create(customer=customer, complete=False)
     
-    product_name = product.name
     orderItem, created = OrderItem.objects.get_or_create(order=order, product=product)
     
     if action == 'add':
@@ -375,14 +368,21 @@ def updateItem(request):
 
 def processOrder(request):
     transaction_id = datetime.datetime.now().timestamp()
-    
-     # Initialize data variable
     data = json.loads(request.body)
-    
+
     if request.user.is_authenticated:
         customer = request.user.customer
-        data = json.loads(request.body)
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
+
+        # if order.shipping == True:
+        #     ShippingAddress.objects.create(
+        #             customer=customer,
+        #             order=order,
+        #             address=data['shipping']['address'],
+        #             city=data['shipping']['city'],
+        #             state=data['shipping']['state'],
+        #             zipcode=data['shipping']['zipcode'],
+        #         )
 
     else:
         customer, order = guestOrder(request, data)
@@ -393,7 +393,7 @@ def processOrder(request):
     if total == order.get_cart_total:
         order.complete = True
     order.save()
-
+    
     if order.shipping == True:
         ShippingAddress.objects.create(
                 customer=customer,
@@ -403,25 +403,59 @@ def processOrder(request):
                 state=data['shipping']['state'],
                 zipcode=data['shipping']['zipcode'],
             )
-        print("Shipping Details Recieved!")
-        message = 'Shipping Details!'
 
-    
-    return render(request, 'order-confirmed.html', {'message': message})
+    return JsonResponse('Payment Complete', safe=False)
 
-def order_confirmed(request):
-    page_name = f'| Order confirmed'
+
+
+# customer
+def newCustomer(request):
+    page_name = f" | Sign Up"
     
-    message = ''
-    context = {'page_name': page_name,
-                'message': message,
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        email = request.POST.get('email', '')
+        password = request.POST.get('password', '')
+        newCustomer = User.objects.filter(email=email).first()
+        if newCustomer:
+            return redirect('/')
+        else:
+            print(f"{username} New customer!")
+            newCustomer = NewCustomer(
+                    username=username,
+                    email=email,
+                    password=password,
+                    )
+            newCustomer.save()
+        return redirect('/')
+    
+    context = {
+                'page_name': page_name,
+                'cartItems': cartItems,
                 }
-    return render(request, 'order-confirmed', context)
+    
+    return render(request, 'signup.html', context)
+# customer
+
+
+def confirmed(request):
+    page_name = f"| Order Complete!"
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
+    context = {
+        'page_name': page_name,
+        'cartItems': cartItems,
+    }
+
+    return render(request, 'confirmed.html', context)
 
 def addProduct(request):
-    
-    page_name = f'| Add New Product'
-    
+
     if request.method == 'POST':
         name = request.POST.get('name', '')
         shop = request.POST.get('shop', '')
@@ -429,49 +463,28 @@ def addProduct(request):
         keywords = request.POST.get('keywords', '')
         image = request.POST.get('image', '')
         price = request.POST.get('price', '')
+        popular_true = request.POST.get('popular_true', '')
+        popular_false = request.POST.get('popular_false', '')
+        size = request.POST.get('size', '')
 
         product = Product(name=name,
                         shop=shop,
                         description=description,
                         keywords=keywords,
                         image=image,
-                        price=price
+                        price=price,
+                        popular_false=popular_false,
+                        popular_true=popular_true,
+                        size=size,
                     )
         product.save()
+        print(f"New Product Saved! {product.pk}, {product.name}")
     
-    context = { 'page_name': page_name}
-    return render(request, 'add_product.html', context)
-
-def api(request):
-    page_name = f'| api'
-    
-    # spot = spotify_playlist(request)
-
-    
-    lyrics = spotify(request)
-    kwargs = lyrics['kwargs']
-    
-    mixcloud_api = mixcloud(request)
-    
-    
-    print(mixcloud_api)
-    
-    context = {
-        'page_name': page_name,
-        'mixcloud_api': mixcloud_api,
-        'kwargs': kwargs,
-    }
-    return render(request, 'api.html', context)
+    return render(request, 'add_product.html')
 
 def delete(request, pk):
-    page_name = f"| Deleted!"
-    
     if request.method == "POST":
         product = Product.objects.get(pk=pk)
         product.delete()
-        return redirect("dashboard /")
-    
-    context = { 
-                'page_name': page_name
-            }
-    return render(request, 'delete.html', context)
+        return redirect("dashboard/")
+    return render(request, 'delete.html')
