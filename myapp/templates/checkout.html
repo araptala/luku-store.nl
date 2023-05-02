@@ -17,18 +17,17 @@
       <p id="digital-true" class="underline">3. Select Payment Method</p>
     </li>
     <li>
-      <p id="confirmed-true" class="underline">4. Confirm Order</p>
+      <p class="underline">4. Confirm Order</p>
     </li>
   </ol>
 </header>
 
 <!-- FORM -->
 <div class="box-element" id="form-wrapper">
-  <p id="shipping-subheading" style="margin-bottom: 25px"></p>
-  <form id="form">
+  <form class="form" id="form">
     {% csrf_token %}
-    <div id="user-info">
-      <div class="form-field">
+    <div style="margin-top: 15px" id="user-info">
+      <div style="margin-top: 15px" class="form-field">
         <input
           required
           class="form-control"
@@ -36,6 +35,8 @@
           name="name"
           placeholder="Name"
         />
+      </div>
+      <div class="form-field">
         <input
           required
           type="email"
@@ -51,8 +52,8 @@
         <input
           class="form-control"
           type="text"
-          name="address"
-          placeholder="Address.."
+          name="country"
+          placeholder="Country"
           required
         />
       </div>
@@ -69,93 +70,88 @@
         <input
           class="form-control"
           type="text"
-          name="state"
-          placeholder="State.."
+          name="address"
+          placeholder="Address.."
           required
         />
-      </div>
-      <div class="form-field">
         <input
           class="form-control"
           type="text"
           name="zipcode"
           placeholder="Zip code.."
-          required
         />
       </div>
       <div class="form-field">
         <input
           class="form-control"
           type="text"
-          name="country"
-          placeholder="Country"
-          required
+          name="state"
+          placeholder="State.."
         />
       </div>
-      <button
-        id="form-button"
-        class="cart-button-black"
-        value="Continue"
-        type="submit"
-      >
-        Continue
+      <button id="form-button" class="cart-button-black" type="submit">
+        Save Address
       </button>
-  </div>
+    </div>
   </form>
-  
+  <img
+    class="box-element-img-form"
+    src="{% static 'images/mail-truck.svg' %}"
+  />
+
   <!-- END OF FORM -->
+
   <!-- PAYMENT OPTIONS ---------------------------------------------------------->
   <section id="payment-info" class="hidden">
-    <!-- LEFT -->
-
-    <div class="left-payment-child">
-      <div class="payment-form">
-        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Cash On Delivery</button>
-        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">iDEAL/PayPal/Google Pay/Klarna</button>
-        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Net Banking</button>
-        <button class="check-group" type="radio" id="make-payment" style="margin-left: 15px;">Debit / Credit Card</button>
-      </div>
-
-      <div style="margin-bottom: 25px;">
-        <ul class="payment-icons">
-          <li><i class="fa-brands fa-cc-visa"></i></li>
-          <li><i class="fa-brands fa-cc-mastercard"></i></li>
-          <li><i class="fa-brands fa-amazon"></i></li>
-          <li><i class="fa-brands fa-paypal"></i><i class="fa-brands fa-paypal"></i></li>
-          <li><i class="fa-brands fa-google-pay"></i></li>
-        </ul>
-      </div>
-    </div>
-    <!-- END OF LEFT -->
+    <div class="left-payment-child" id="paypal-button-container"></div>
   </section>
   <!-- END OF PAYMENT OPTIONS ---------------------------------------------------------->
 </div>
 
-
-<section id="confirmed" class="confirmed hidden">
-<!-- CONFIRMED ---------------------------------------------------------->
-    <!-- HEADING -->
-
-    <h1 class="confirmed-heading">RECIEVED <i class="fa-sharp fa-solid fa-check-double"></i></h1><br>
-
-    <!-- ORDER NUMBER -->
-    <span>Order ID: 1682366957-481252</span> <br>
-
-    <!-- TRUCK IMAGE -->
-    <img class="delivery-truck" src="{% static 'images/mail-truck.svg' %}" alt="Delivery truck" /><br>
-
-    <!-- DATE -->
-    <h4>Estimated Delivery</h4><br>
-    <h3 class="delivery-date">Saturday, 29th April, 2023</h3><br>
-
-    <!-- BUTTON -->
-
-    <a class="continue-shopping-btn btn-secondary" href="{% url 'store' %}">Continue Shopping &#8594</a>
-</section>
 <!-- javascript -->
+<!-- Paypal -->
+<!-- Paypal API -->
+<script src="https://www.paypal.com/sdk/js?client-id=AWQLLidcguyPsillx1mX6siiFmBlTpZOkE7qxy5vvzLb1jeoK4_DGKE9f27VEiwd5baRTgVkfXCMPK51&currency=EUR"></script>
+<!-- end of Paypal API -->
+
+<!-- Paypal Button -->
+<script>
+  var total = "{{ order.get_cart_total }}";
+
+  // Render the PayPal button into #paypal-button-container
+  paypal
+    .Buttons({
+      style: {
+        color: "blue",
+        shape: "pill",
+        label: "pay",
+      },
+      // Set up the transaction
+      createOrder: function (data, actions) {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: total,
+              },
+            },
+          ],
+        });
+      },
+
+      // Finalize the transaction
+      onApprove: function (data, actions) {
+        return actions.order.capture().then(function (details) {
+          submitFormData();
+        });
+      },
+    })
+    .render("#paypal-button-container");
+</script>
+<!-- End of Paypal Button -->
+<!-- End of Paypal -->
 <script type="text/javascript">
   var shipping = "{{ order.shipping }}";
-  var total = "{{ order.get_cart_total }}";
 
   if (shipping == "False") {
     document.getElementById("shipping-info").innerHTML = "";
@@ -186,53 +182,20 @@
   var form = document.getElementById("form");
 
   csrftoken = form.getElementsByTagName("input")[0].value;
-  console.log("Newtoken:", csrftoken);
-
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    console.log("Form submitted...");
+    console.log("Form submitted 0%...");
     document.getElementById("form-button").classList.add("hidden");
+    document.getElementById("payment-info").classList.remove("hidden");
     document.getElementById("form").classList.add("hidden");
     document.getElementById("checkout-current").textContent = "Select Payment";
-    document.getElementById("payment-info").classList.remove("hidden");
     document.getElementById("digital-false").classList.remove("current");
     document.getElementById("digital-true").classList.add("current");
-    
+    console.log("...100% form submission completed");
   });
-  function confirmed() {
-    confirmed = document.getElementById("confirmed").classList.remove("hidden");
-    confirmed = document.getElementById("payment-info").classList.add("hidden");
 
-    document
-      .getElementById("cash-on-delivery")
-      .addEventListener("click", (e) => {
-        console.log("Cash on delivery clicked");
-        confirmed();
-      });
-  }
-
-  document
-    .getElementById("make-payment")
-    .addEventListener("click", function (e) {
-      e.preventDefault()
-      document.getElementById("checkout-current").textContent = "Order Confirmed!";
-      document.getElementById("shipping-info").classList.add("hidden");
-      alert("Your payment was recieved!");
-
-      cart = {};
-      document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
-
-      submitFormData();
-    });
   function submitFormData() {
-    console.log("Started processing payment...");
-    document.getElementById("confirmed").classList.remove("hidden");
-    document.getElementById("payment-info").classList.add("hidden");
-    document.getElementById("payment-info").classList.add("hidden");
-    document.getElementById("digital-false").classList.remove("current");
-    document.getElementById("digital-true").classList.remove("current");
-    document.getElementById("confirmed-true").classList.add("current");
-
+    console.log("Payment button clicked");
 
     var userFormData = {
       name: null,
@@ -268,7 +231,7 @@
         "Content-Type": "application/json",
         "X-CSRFToken": csrftoken,
       },
-      body: JSON.stringify({ 'form': userFormData, 'shipping': shippingInfo }),
+      body: JSON.stringify({ form: userFormData, shipping: shippingInfo }),
     })
       .then((response) => response.json())
       .then((response) => {
@@ -277,7 +240,7 @@
 
         cart = {};
         document.cookie = "cart=" + JSON.stringify(cart) + ";domain=;path=/";
-        window.location.href = "{% url 'store' %}";
+        window.location.href = "{% url 'confirmed' %}";
       });
   }
 </script>
