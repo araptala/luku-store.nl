@@ -14,8 +14,8 @@ class Product(models.Model):
     description = models.TextField()
     keywords = models.CharField(max_length=50, blank=True) 
     price = models.DecimalField(max_digits=7, decimal_places=2)
+    stock = models.IntegerField(default=0)
     image = models.ImageField(null=True, upload_to="products/", blank=True, default='image.jpg')
-    video = models.ImageField(null=True, upload_to="products/", blank=True, default='video.mp4')
     digital = models.BooleanField(default=False, null=True, blank=False)
     popular = models.BooleanField(default=False, null=True, blank=False)
     
@@ -69,40 +69,29 @@ class Product(models.Model):
 # BLOG ENTRY
 
 class Blog(models.Model):
-    title = models.CharField(max_length=100)
-    author = models.CharField(max_length=100)
-    summary = models.CharField(max_length=255)
-    keywords = models.CharField(max_length=255, blank=True) 
+    title = models.CharField(max_length=50)
+    summary = models.CharField(max_length=80)
     content = models.TextField()
-    pub_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
+    author = models.CharField(max_length=100)
+    keywords = models.CharField(max_length=255, blank=True) 
     image = models.ImageField(null=True, blank=True, upload_to="blog/", default='blog.jpg')
-    video = models.ImageField(null=True, blank=True, upload_to="blog/", default='blog.mp4')
     youtube = models.TextField(blank=True, null=True)
-
     BRAND = (
         ('luku-store', 'Luku Store'),
         ('akiba-studios', 'Akiba Studios'),
         ('default', 'Default'),
     )
-    brand = models.CharField(max_length=15, choices=BRAND, null=True, default='luku-store')
-
+    brand = models.CharField(max_length=15, choices=BRAND, null=True, blank=False, default='luku-store')
+    pub_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self): 
-        return f"{self.title} || {self.pub_date.strftime('%A, %B %d, %Y')}"
+        return f"{self.title} || Published On: {self.pub_date.strftime('%A, %B %d, %Y')}"
     
     @property
     def imageURL(self):
         try:
             url = self.image.url
-        except:
-            url = ''
-        return url
-
-    @property
-    def videoURL(self):
-        try:
-            url = self.video.url
         except:
             url = ''
         return url
@@ -115,29 +104,27 @@ class Blog(models.Model):
 class AboutUs(models.Model): 
     summary = models.CharField(max_length=700)
     name = models.CharField(max_length=100, default=" ")
-    role = models.CharField(max_length=50, default=" ")
+    role = models.CharField(max_length=100, default=" ")
     instagram = models.CharField(max_length=50, default=" ")
     tiktok = models.CharField(max_length=50, default=" ")
     facebook = models.CharField(max_length=50, default=" ")
     twitter = models.CharField(max_length=50, default=" ")
     bio = models.TextField(default=" ")
     image = models.ImageField(null=True, blank=True, upload_to="about-us/", default='aboutus.jpg')
-    video = models.ImageField(null=True, blank=True, upload_to="about-us/", default='aboutus.mp4')
 
     def __str__(self):
         return f"{self.name} || {self.role}"
     
+    @property
+    def imageURL(self):
+        try:
+            url = self.image.url
+        except:
+            url = ''
+        return url
+    
 # END OF ABOUT US
 
-# NEWSLETTER
-
-class Newsletter(models.Model):
-    email = models.EmailField(default=" ")
-
-    def __str__(self):
-        return self.email
-
-# END OF NEWSLETTER
 
 # HELP
 
@@ -159,24 +146,27 @@ class Customer(models.Model):
 	def __str__(self):
 		return self.name
 
+class NewCustomer(models.Model):
+	user = models.OneToOneField(User, null=True, blank=True, on_delete=models.CASCADE)
+	name = models.CharField(max_length=200, null=True)
+	username = models.CharField(max_length=200)
+	email = models.EmailField(max_length=200)
+	password = models.CharField(max_length=200)
+
+	def __str__(self):
+		return self.username
+
 class Order(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
     date_ordered = models.DateTimeField(auto_now_add=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
     transaction_id = models.CharField(max_length=200, null=True)
-    
-    def __str__(self):
-        return str(self.id) ('%A, %B %d, %Y')
-    
-    def __str__(self):
-        return f'Order #{self.pk} || {self.customer} {self.date_ordered}'
-    
+
     def __str__(self):
         date_format = DateFormat(self.date_ordered.astimezone(timezone.get_current_timezone()))
         formatted_date = date_format.format('h:iA, l jS F Y')
-        return f'Order #{self.pk} || {self.customer} || Date: {formatted_date}'
+        return f'Order #{self.pk} || {self.customer} || At: {formatted_date}'
 
-    
     @property
     def shipping(self):
         shipping = False
@@ -212,7 +202,6 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
     quantity = models.IntegerField(default=0, null=True, blank=True)
-    date_added = models.DateTimeField(auto_now_add=True)
     
     @property
     def get_total(self):
@@ -228,7 +217,6 @@ class OrderItem(models.Model):
         total = sum([item.quantity for item in orderitems])
         return total
     
-
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, blank=True, null=True)
@@ -243,11 +231,21 @@ class ShippingAddress(models.Model):
         ('Office', 'Office'),
         ('Default', 'Default'),
     )
-    label = models.CharField(max_length=15, choices=LABEL, null=True, default='')
-    
-    
+    label = models.CharField(max_length=15, choices=LABEL, null=True, default='Home')
+
     def __str__(self):
         return self.address
     
     def __str__(self):
-        return f"{self.customer.name}'s {self.label} Address"
+        return f"{self.customer}'s {self.label} Address"
+
+# NEWSLETTER
+
+class Newsletter(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, blank=True, null=True)
+    email = models.EmailField(default=" ")
+
+    def __str__(self):
+        return self.email
+
+# END OF NEWSLETTER
