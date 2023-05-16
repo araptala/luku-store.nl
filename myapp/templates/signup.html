@@ -1,35 +1,57 @@
 {% extends 'base.html' %} {% load static %} {% block body %}
-<section class="signup-form">
-  <article class="signup-left">
-    <div>
-      <h2>Create an Account</h2>
-      <p style="font-size: 0.9rem">Start your journey with us.</p>
-    </div>
+<div class="text-center container">
+  <main class="form-signin w-50 m-auto">
     <form method="POST">
       {% csrf_token %}
-      <input
-        class=""
-        type="text"
-        id="user"
-        name="user"
-        placeholder="Username"
-        required
-      />
+      <h1 style="margin: 2rem 0">Sign Up</h1>
+      <div class="form-group">
+        <input
+          style="padding: 1rem"
+          type="text"
+          name="username"
+          class="form-control"
+          placeholder="Username"
+        />
+      </div>
 
-      <input
-        class=""
-        type="password"
-        id="password"
-        name="password"
-        placeholder="Password"
-        password
-      />
+      <div class="form-group">
+        <input
+          style="padding: 1rem; margin-top: 1rem"
+          type="email"
+          name="email"
+          class="form-control"
+          placeholder="Email"
+        />
+      </div>
 
-      <button type="submit">Log In</button>
+      <div style="margin-top: 1rem" class="form-group">
+        <input
+          style="padding: 1rem"
+          type="password"
+          name="password"
+          class="form-control"
+          placeholder="Password"
+        />
+      </div>
+
+      <div class="checkbox mb-3 w-25">
+        <label>
+          <input
+            style="margin-top: 1rem; cursor: pointer"
+            type="checkbox"
+            value="remember-me"
+          />
+          Remember me
+        </label>
+      </div>
+      <button
+        style="padding: 1rem; font-size: 1rem; margin-bottom: 3rem"
+        class="w-100 btn btn-lg btn-dark"
+        type="submit"
+      >
+        Sign in
+      </button>
     </form>
-  </article>
-  <article class="signup-right">
-    <img src="{% static 'images/signup/takwa-bay-3-surf.png' %}" alt="" />
-  </article>
-</section>
+  </main>
+</div>
 {% endblock %}
