@@ -3,11 +3,17 @@ from django.http import JsonResponse
 import json
 import datetime
 from .models import *
+from .forms import OrderForm, CreateUserForm
 from . utils import cookieCart, cartData, guestOrder, search_items
 import http.client
 from django.contrib.auth.decorators import user_passes_test
-from django.core.paginator import Paginator
+from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Q
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
+from django.core.paginator import Paginator
 
 
 # ERROR - DONE
@@ -63,6 +69,11 @@ def dashboard(request):
     blogs = Blog.objects.all()
     shipping_addresses = ShippingAddress.objects.all()
     
+    page_name = f" | Dashboard"
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    
     total_products = Product.objects.count()
     total_blogs = Blog.objects.count()
     context = {
@@ -71,12 +82,13 @@ def dashboard(request):
             'total_products': total_products, 
             "total_blogs": total_blogs,
             'shipping_addresses': shipping_addresses,
+            'cartItems': cartItems,
+            'page_name': page_name,
             }
     return render(request, 'dashboard.html', context)
 # END OF DASHBOARD
 
 def index(request):
-    
     page_name = "| Online Clothing Store | Affordable and Stylish Clothes from Kenya"
     products = Product.objects.all()
     blogs = Blog.objects.all()
@@ -289,7 +301,7 @@ def signup(request):
         }
     return render(request, 'signup.html', context)
 
-# WISHLIST
+@login_required(login_url='login')
 def wishlist(request):
     products = Product.objects.all()
     total_products = Product.objects.count()
@@ -323,8 +335,6 @@ def brands(request):
     akiba_studios_products = search_items(keywords)
     # Products from akiba studios printed on the terminal
 
-
-    
     data = cartData(request)
     cartItems = data['cartItems']
 
@@ -339,7 +349,7 @@ def brands(request):
                 }
     return render(request, 'brands.html', context)
 # END OF BRAND
-    
+
 def newsletter(request):
     page_name = f" | Newsletter Subscription"
     
@@ -433,38 +443,71 @@ def processOrder(request):
 
     return JsonResponse('Payment Complete', safe=False)
 
+def loginPage(request):
 
-
-# customer
-def newCustomer(request):
-    page_name = f" | Sign Up"
+    page_name = f" | Log In"
     
     data = cartData(request)
     cartItems = data['cartItems']
     
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        email = request.POST.get('email', '')
-        password = request.POST.get('password', '')
-        newCustomer = User.objects.filter(email=email).first()
-        if newCustomer:
-            return redirect('/')
-        else:
-            print(f"{username} New customer!")
-            newCustomer = NewCustomer(
-                    username=username,
-                    email=email,
-                    password=password,
-                    )
-            newCustomer.save()
-        return redirect('/')
+    if request.user.is_authenticated:
+        return redirect('index')
+    else:
+        if request.method == 'POST':
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                if user.is_staff:
+                    return redirect('admin:index')
+                else:
+                    return redirect('login')
+            else:
+                messages.info(request, 'Username Or Password is incorrect')
+
+        context = {
+                    'page_name': page_name,
+                    'cartItems': cartItems,
+                    }
+
+        return render(request, 'login.html', context)
+
+def logoutUser(request):
+    logout(request)
+    return redirect('login')
+
+def registerPage(request):
     
+    page_name = f" | Sign Up"
+    
+    form = CreateUserForm()
+    
+
+    data = cartData(request)
+    cartItems = data['cartItems']
+
+    if request.user.is_authenticated:
+        return redirect('index')
+    else:
+        if request.method == "POST":
+            form = CreateUserForm(request.POST)
+            if form.is_valid():
+                form.save()
+                user = form.cleaned_data.get('username')
+                messages.success(request, 'Account was created for' + user)
+                
+                return redirect('login')
+
     context = {
                 'page_name': page_name,
                 'cartItems': cartItems,
+                'form': form,
                 }
-    
-    return render(request, 'signup.html', context)
+
+    return render(request, 'register.html', context)
 # customer
 
 
@@ -481,7 +524,15 @@ def confirmed(request):
 
     return render(request, 'confirmed.html', context)
 
-def addProduct(request):
+
+@login_required(login_url='login')
+def add_product(request):
+    page_name = '| New Luku!'
+    
+    products = Product.objects.order_by('-pk')
+    orders = Order.objects.order_by('-pk')
+    total_products = Product.objects.count()
+    total_orders = Order.objects.count()
 
     if request.method == 'POST':
         name = request.POST.get('name', '')
@@ -490,9 +541,8 @@ def addProduct(request):
         keywords = request.POST.get('keywords', '')
         image = request.POST.get('image', '')
         price = request.POST.get('price', '')
-        popular_true = request.POST.get('popular_true', '')
-        popular_false = request.POST.get('popular_false', '')
-        size = request.POST.get('size', '')
+        popular = request.POST.get('popular', '')
+        sizes = request.POST.get('size', '')
 
         product = Product(name=name,
                         shop=shop,
@@ -500,15 +550,22 @@ def addProduct(request):
                         keywords=keywords,
                         image=image,
                         price=price,
-                        popular_false=popular_false,
-                        popular_true=popular_true,
-                        size=size,
+                        popular=popular,
+                        sizes=sizes,
                     )
         product.save()
         print(f"New Product Saved! {product.pk}, {product.name}")
     
-    return render(request, 'add_product.html')
+    context = {
+        'products': products,
+        'page_name': page_name,
+        'orders': orders,
+        'total_orders': total_orders,
+        'total_products': total_products,
+    }
+    return render(request, 'add_product.html', context)
 
+@login_required(login_url='login')
 def delete(request, pk):
     if request.method == "POST":
         product = Product.objects.get(pk=pk)
